@@ -4,9 +4,7 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 requirements:
-#- $import: envvar-global.yml
 - $import: samtools-docker.yml
-- class: InlineJavascriptRequirement
 
 inputs:
   compression_level:
@@ -15,45 +13,31 @@ inputs:
       prefix: -l
     doc: |
       Set compression level, from 0 (uncompressed) to 9 (best)
-  threads:
-    type: int?
-    inputBinding:
-      prefix: -@
-
-    doc: Set number of sorting and compression threads [1]
-  memory:
-    type: string?
-    inputBinding:
-      prefix: -m
-    doc: |
-      Set maximum memory per thread; suffix K/M/G recognized [768M]
-  input:
+  alignments:
     type: File
     inputBinding:
       position: 1
 
     doc: Input bam file.
-  output_name:
-    type: string
-    inputBinding:
-      position: 2
-
-    doc: Desired output filename.
   sort_by_name:
     type: boolean?
     inputBinding:
       prefix: -n
 
     doc: Sort by read names (i.e., the QNAME field) rather than by chromosomal coordinates.
+    
 outputs:
-  samtools-sort_output:
-    type: File
-    outputBinding:
-      glob: $(inputs.output_name)
+  sorted_alignments: stdout
+  
+stdout: $(inputs.alignments.nameroot)_sorted.bam
 
 baseCommand: [samtools, sort]
 arguments:
- - -f
+ - prefix: -@
+   valueFrom: $(runtime.cores)
+ - prefix: -m
+   valueFrom: $(runtime.ram)M
+ 
 
 #$namespaces:
 #  s: http://schema.org/

@@ -4,19 +4,9 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 requirements:
-#- $import: envvar-global.yml
 - $import: samtools-docker.yml
-- class: InlineJavascriptRequirement
 
 inputs:
-  isbam:
-    type: boolean
-    default: false
-    inputBinding:
-      position: 2
-      prefix: -b
-    doc: |
-      output in BAM format
   readswithoutbits:
     type: int?
     inputBinding:
@@ -61,13 +51,11 @@ inputs:
 
     doc: |
       read tag to strip (repeatable) [null]
-  input:
+  alignments:
     type: File
     inputBinding:
       position: 4
-
-    doc: |
-      Input bam file.
+    doc: Input sam file.
   readsquality:
     type: int?
     inputBinding:
@@ -90,21 +78,6 @@ inputs:
     doc: |
       only include reads with number of CIGAR operations
       consuming query sequence >= INT [0]
-  iscram:
-    type: boolean
-    default: false
-    inputBinding:
-      position: 2
-      prefix: -C
-    doc: |
-      output in CRAM format
-  threads:
-    type: string
-    inputBinding:
-      position: 1
-      prefix: -Sb
-    doc: |
-      number of BAM compression threads [0]
   fastcompression:
     type: boolean
     default: false
@@ -165,16 +138,17 @@ inputs:
       prefix: -l
     doc: |
       only include reads in library STR [null]
-  output_name:
-    type: string
-    inputBinding:
-      position: 2
-      prefix: -o
+      
+arguments:
+  - prefix: -Sb
+    valueFrom: $(runtime.cores)
+  - -b
+
+stdout: $(inputs.alignments.basename).bam
+
 outputs:
-  samtools-view_output:
-    type: File
-    outputBinding:
-      glob: $(inputs.output_name)
+  binary_alignments:
+    type: stdout
 
 baseCommand: [samtools, view]
 #$namespaces:
