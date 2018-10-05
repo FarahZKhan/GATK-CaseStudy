@@ -147,7 +147,7 @@ arguments:
 stdout: $(inputs.alignments.basename).bam
 
 outputs:
-  alignments:
+  binary_alignments:
     type: stdout
 
 baseCommand: [samtools, view]
