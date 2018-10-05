@@ -75,7 +75,7 @@ steps:
   sort-alignments:
     run: samtools-sort.cwl
     in:
-      input: sam-to-bam/binary_alignments    
+      alignments: sam-to-bam/binary_alignments    
     out: [sorted_alignments]
     
   markDuplicates:
