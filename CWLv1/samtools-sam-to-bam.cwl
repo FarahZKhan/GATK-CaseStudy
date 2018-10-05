@@ -55,9 +55,7 @@ inputs:
     type: File
     inputBinding:
       position: 4
-
-    doc: |
-      Input bam file.
+    doc: Input sam file.
   readsquality:
     type: int?
     inputBinding:
@@ -80,13 +78,6 @@ inputs:
     doc: |
       only include reads with number of CIGAR operations
       consuming query sequence >= INT [0]
-  threads:
-    type: string
-    inputBinding:
-      position: 1
-      prefix: -Sb
-    doc: |
-      number of BAM compression threads [0]
   fastcompression:
     type: boolean
     default: false
@@ -156,7 +147,7 @@ arguments:
 stdout: $(inputs.alignments.basename).bam
 
 outputs:
-  samtools-view_output:
+  alignments:
     type: stdout
 
 baseCommand: [samtools, view]
