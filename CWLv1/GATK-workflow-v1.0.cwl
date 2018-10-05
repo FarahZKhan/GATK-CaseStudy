@@ -4,78 +4,35 @@ cwlVersion: v1.0
 class: Workflow
 
 inputs:
-
   reference: File
-
-  reads:
-    type:
-      type: array
-      items: File
-
-  bwa_output_filename: string
-  
-  createDict_output_filename: string
-    
- # input: File
-
-  samtools-view-isbam: boolean
-  
-  output_samtools-view: string
-  
-  samtools-view-threads: string
-  
-  output_samtools-sort: string
-  
+  reads: File[]
   output_markDuplicates: string
-  
   metricsFile_markDuplicates: string
-  
   readSorted_markDuplicates: boolean
-  
   removeDuplicates_markDuplicates: boolean
-  
   createIndex_markDuplicates: boolean
-  
   output_RealignTargetCreator: string
-  
   reference: File
-  
-  known_variant_db:
-    type:
-      type: array
-      items: File
-  
+  known_variant_db: File[]
   output_IndelRealigner: string
-  
   output_BaseRecalibrator: string
-  
-  covariate:
-    type:
-      type: array
-      items: string
-      
+  covariate: string[]
   output_PrintReads: string
-  
   output_HaplotypeCaller: string
-  
   dbsnp: File
     
 outputs:
-  ReferenceSequenceDictionary:
+  unsorted_alignments:
     type: File
-    outputSource: create-dict/createDict_output
+    outputSource: align/alignments
     
-  bwamem_output:
+  unsorted_alignments_bam:
     type: File
-    outputSource: bwa-mem/bwa-mem_output
+    outputSource: sam-to-bam/binary_alignments
     
-  samtoolsview:
+  sorted-alignments:
     type: File
-    outputSource: samtools-view/samtools-view_output
-    
-  samtoolssort:
-    type: File
-    outputSource: samtools-sort/samtools-sort_output
+    outputSource: sort-alignments/sorted_alignments
     
   mark_Duplicates:
     type: File
@@ -102,49 +59,31 @@ outputs:
     outputSource: haplotypeCaller/output_haplotypeCaller
 
 steps:
-
-  create-dict:
-    run: picard-CreateSequenceDictionary.cwl
-    in:
-      reference: reference
-      output_filename: createDict_output_filename
-    
-    out: [createDict_output]
-
-
-  bwa-mem:
+  align:
     run: BWA-mem.cwl 
     in:
       reference: reference
       reads: reads
-      dictCreated: create-dict/createDict_output
-      output_filename: bwa_output_filename
-      
-    out: [bwa-mem_output]
+    out: [alignments]
     
-  samtools-view:
-    run: samtools-view.cwl
+  sam-to-bam:
+    run: samtools-sam-to-bam.cwl
     in:
-      input: bwa-mem/bwa-mem_output
-      isbam: samtools-view-isbam
-      output_name: output_samtools-view
-      threads: samtools-view-threads
+      input: align/alignments
+      isbam: samtools-view-isbam    
+    out: [binary_alignments]
     
-    out: [samtools-view_output]
-    
-  samtools-sort:
+  sort-alignments:
     run: samtools-sort.cwl
     in:
-      input: samtools-view/samtools-view_output
-      output_name: output_samtools-sort 
-    
-    out: [samtools-sort_output]
+      input: sam-to-bam/binary_alignments    
+    out: [sorted_alignments]
     
   markDuplicates:
     run: picard-MarkDuplicates.cwl
     in:
       outputFileName_markDups: output_markDuplicates
-      inputFileName_markDups: samtools-sort/samtools-sort_output
+      inputFileName_markDups: sort-alignments/sorted_alignments
       metricsFile: metricsFile_markDuplicates
       readSorted: readSorted_markDuplicates
       removeDuplicates: removeDuplicates_markDuplicates
