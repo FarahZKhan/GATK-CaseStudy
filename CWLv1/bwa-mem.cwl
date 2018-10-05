@@ -1,15 +1,11 @@
 #!/usr/bin/env cwl-runner
-
 cwlVersion: v1.0
 class: CommandLineTool
 
 requirements:
-#- $import: envvar-global.yml
 - $import: bwa-docker.yml
-- class: InlineJavascriptRequirement
 
 inputs:
-
   readGroupHeader:
     type: string
     default: "@RG\\tID:chr21\\tPL:ILLUMINA\\tLB:L001\\tSM:chr21"
@@ -34,7 +30,6 @@ inputs:
       - .sa
       - .fai
       - ^.dict
-  output_filename: string  
   reads:
     type:
       type: array
@@ -56,13 +51,13 @@ inputs:
   dictCreated:
     type: ["null", File]
     
-stdout: $(inputs.output_filename)
+stdout: $(inputs.reads[0].basename).sam
 
 outputs:
-  bwa-mem_output:
+  alignments:
     type: File
     outputBinding:
-      glob: $(inputs.output_filename)
+      glob: (inputs.reads[0].basename).sam
 
 baseCommand:
 - bwa
