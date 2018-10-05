@@ -60,7 +60,7 @@ outputs:
 
 steps:
   align:
-    run: BWA-mem.cwl 
+    run: bwa-mem.cwl 
     in:
       reference: reference
       reads: reads
@@ -70,7 +70,6 @@ steps:
     run: samtools-sam-to-bam.cwl
     in:
       input: align/alignments
-      isbam: samtools-view-isbam    
     out: [binary_alignments]
     
   sort-alignments:
