@@ -69,7 +69,7 @@ steps:
   sam-to-bam:
     run: samtools-sam-to-bam.cwl
     in:
-      input: align/alignments
+      alignments: align/alignments
     out: [binary_alignments]
     
   sort-alignments:
