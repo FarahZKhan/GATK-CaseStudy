@@ -47,9 +47,7 @@ inputs:
     inputBinding:
       position: 1
       prefix: -I
-      itemSeparator: ','     
-  dictCreated:
-    type: ["null", File]
+      itemSeparator: ','
     
 stdout: $(inputs.reads[0].basename).sam
 
